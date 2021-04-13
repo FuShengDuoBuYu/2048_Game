@@ -18,4 +18,5 @@ int main(int argc,char *argv[]){
     //处理用户的输入
     userInput(cells,endNum,users,steps,modeNum,ROW,COL);
     return 0;
+    
 } 
