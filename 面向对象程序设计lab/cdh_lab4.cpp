@@ -347,8 +347,6 @@ void Game2048::MoveGame(){
                         }
                     }
                 }
-
-
             }
             return ;
         default:
