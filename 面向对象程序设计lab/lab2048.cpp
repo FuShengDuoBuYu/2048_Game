@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <time.h> 
 #include "lab2048.h"
-#include <windows.h>
-
+#include <cstdlib>
+#include <fstream>
 using namespace std;
 
 //Cell类的方法实现
@@ -51,6 +51,29 @@ int* Util:: getRandArray(int length){
         randArr[i - 1] = tmp;
     }
     return randArr;
+}
+
+vector<int> Util::stringToInt(string s){
+    std::vector<int> intArray;
+    int j = 0;
+    for (int i = 0; i < s.length();i++){
+        if(s[i] == ' '){
+            int num = 0;
+            for (int k = j; k < i;k++){
+                int temp = s[k] - '0';
+                for (int m = 0; m < i - k - 1;m++){
+                    temp = temp * 10;
+                }
+                num += temp;
+            }
+            intArray.push_back(num);
+            j = i + 1;   
+        }
+    }
+    int num = 0;
+    string sub = s.substr(j, s.length() - j);
+    intArray.push_back(atoi(sub.c_str()));
+    return intArray;
 }
 
 //其他方法的实现
@@ -232,7 +255,7 @@ void updateCells(vector<Cell> &cells,char order,vector<User> &users,int &steps,i
 }
 
 //随机位置生成一个2的方法
-void createRand2(vector<Cell> &cells,vector<User> &users,int modeNum){
+int createRand2(vector<Cell> &cells,vector<User> &users,int modeNum){
     vector<int> nullPlace;
     //记录值为0的下标
     for (int i = 0; i < cells.size();i++){
@@ -245,9 +268,13 @@ void createRand2(vector<Cell> &cells,vector<User> &users,int modeNum){
         endGame(users, modeNum);
     }
     //随机位置产生2
-    else{
-        cells[nullPlace[rand() % nullPlace.size()]].changeValue(2);
+    else
+    {
+        int place = nullPlace[rand() % nullPlace.size()];
+        cells[place].changeValue(2);
+        return place;
     }
+    return 0;
 }
 
 //判断是否进入测试模式
@@ -370,6 +397,7 @@ int* moveDirection(vector<Cell> cells,std::vector<User> users, int ROW, int COL,
             break;
         }
     }
+
     copyCells = cells;
     //向下判断
     downUpdateCells(copyCells, users, ROW, COL, steps);
@@ -406,7 +434,8 @@ int* moveDirection(vector<Cell> cells,std::vector<User> users, int ROW, int COL,
 
 void upUpdateCells(std::vector<Cell> &cells, std::vector<User> &users, int ROW, int COL,int &steps){
     //对每一列依次向上进行合并和移动
-    for (int i = 0; i < COL;i++){
+    for (int i = 0; i < COL; i++)
+    {
         //对第i列进行合并
         for (int j = 0; j < ROW-1;j++){
             for (int k = j + 1; k <= ROW-1;k++){
@@ -554,4 +583,111 @@ void updateCells(vector<Cell> &cells,char order,vector<User> &users,int &steps,i
             cin >> order;
         }
     }
+}
+
+//读取文件内容的方法
+vector<string> readFiles(string filename){
+    vector<string> fileContent;
+    ifstream in(filename);
+    string s;
+    //第i行
+    int i = 0;
+    while (getline(in, s)){
+        fileContent.push_back(s);
+    }
+    return fileContent;
+}
+
+//处理输入的文件中的信息
+char handleMessageInFile(vector<string> fileContent,int &ROW,int &COL,vector<Cell> &cells){
+    //第一行的维数
+    for (int i = 0; i < fileContent[0].length();i++){
+        if(fileContent[0][i]>='1' && fileContent[0][i]<='9'){
+            ROW = COL = fileContent[0][i] - '0';
+        }
+        break;
+    }
+    
+    //第2行到第k+1行的棋盘数据
+    //TODO::这里需要一个string中找数字的方法
+    vector<int> values;
+    Util u;
+    for (int i = 1; i < ROW + 1; i++){
+        values = u.stringToInt(fileContent[i]);
+        for (int j = 0; j < values.size();j++){
+            cells.push_back(Cell(values[j]));
+        }
+    }
+    char moveDirection;
+    //最后一行的移动方向
+    for (int i = 0; i < fileContent[fileContent.size()-1].length();i++){
+        if(fileContent[fileContent.size()-1][i]>='a' && fileContent[fileContent.size()-1][i]<='z'){
+            moveDirection = fileContent[fileContent.size()-1][i];
+        }
+        else if(fileContent[fileContent.size()-1][i]>='A' && fileContent[fileContent.size()-1][i]<='Z'){
+            moveDirection = fileContent[fileContent.size()-1][i] - 'a';
+        }
+        break;
+    }
+    //返回要移动的方向
+    
+    return moveDirection;
+}
+
+//获取最后写入文件的数据
+vector<string> resultFile(char moveDirections,vector<Cell> cells,vector<User> users,int ROW,int COL){
+    vector<string> resultString;
+    int fakeSteps = 3;
+    int *direction = moveDirection(cells, users, ROW, COL, fakeSteps);
+    //第一行的string
+    string directions;
+    directions = to_string(direction[4]);
+    if (direction[0] == 1){
+        directions.append(" w");
+    }
+    if(direction[1]==1){
+        directions.append(" a");
+    }
+    if(direction[3]==1){
+        directions.append(" s");
+    }
+    if(direction[2]==1){
+        directions.append(" z");
+    }
+    resultString.push_back(directions);
+    //棋盘的string
+    //先更新棋盘
+    switch (moveDirections){
+        case 'w': upUpdateCells(cells,users, ROW, COL, fakeSteps);
+            break;
+        case 'a': leftUpdateCells(cells,users, ROW, COL, fakeSteps);
+            break;
+        case 'z': downUpdateCells(cells,users, ROW, COL, fakeSteps);
+            break;
+        case 's': rightUpdateCells(cells,users, ROW, COL, fakeSteps);
+            break;
+    }
+    //再写入数组
+    for (int i = 0; i < ROW;i++){
+        string row = "";
+        for (int j = 0; j < COL;j++){
+            if(j == COL - 1){
+                row.append(to_string(cells[i * ROW + j].getValue()));
+            }
+            else{
+                row.append(to_string(cells[i * ROW + j].getValue()));
+                row.append(" ");
+            }
+        }
+        resultString.push_back(row);
+    }
+    //随机产生的一个2
+    resultString.push_back("2");
+    //找到随机生成2的位置
+    int randomPlace = createRand2(cells, users, 1);
+    string coordinate = to_string(randomPlace / ROW) + " " + to_string(randomPlace % COL);
+    resultString.push_back(coordinate);
+    //获取获得的分数
+    resultString.push_back(to_string(users[0].getScore()));
+    return resultString;
 }

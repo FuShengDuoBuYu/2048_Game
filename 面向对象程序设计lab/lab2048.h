@@ -37,6 +37,7 @@ class Util{
         int *getRandArray(int length);
         Util(){};
         ~Util(){};
+        std::vector<int> stringToInt(std::string s);
 };
 
 class User{
@@ -66,7 +67,7 @@ void printCells(std::vector<Cell> cells,std::vector<User> users,int steps,int mo
 std::vector<Cell> createCells(int ROW,int COL);
 void userInput(std::vector<Cell> &cells,int endNum,std::vector<User> &users,int &steps,int modeNum,int ROW,int COL);
 void updateCells(std::vector<Cell> &cells,char order,std::vector<User> &users,int &steps,int ROW,int COL,int modeNum);
-void createRand2(std::vector<Cell> &cells,std::vector<User> &users,int modeNum);
+int createRand2(std::vector<Cell> &cells,std::vector<User> &users,int modeNum);
 void ifTest(int &endNum);
 int welcomePage(int &ROW,int &COL);
 std::vector<User> createUsers(int modeNum);
@@ -77,4 +78,7 @@ void leftUpdateCells(std::vector<Cell> &cells, std::vector<User> &users, int ROW
 void rightUpdateCells(std::vector<Cell> &cells, std::vector<User> &users, int ROW, int COL,int &steps);
 int* moveDirection(std::vector<Cell> cells, std::vector<User> users, int ROW, int COL, int &steps);
 void updateCells(std::vector<Cell> &cells,char order,std::vector<User> &users,int &steps,int ROW,int COL,int modeNum,std::string orderString,char directionChar);
+std::vector<std::string> readFiles(std::string filename);
+char handleMessageInFile(std::vector<std::string> fileContent, int &ROW, int &COL, std::vector<Cell> &cells);
+std::vector<std::string> resultFile(char moveDirections,std::vector<Cell> cells,std::vector<User> users,int ROW,int COL);
 #endif
