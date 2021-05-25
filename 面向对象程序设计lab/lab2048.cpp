@@ -7,6 +7,8 @@
 #include "lab2048.h"
 #include <cstdlib>
 #include <fstream>
+#include "log.h"
+
 using namespace std;
 
 //Cell类的方法实现
@@ -135,12 +137,12 @@ void printCells(vector<Cell> cells,vector<User> users,int steps,int modeNum,int 
     }
     //打印下一个用户该输入指令
     if(modeNum != 1){
-        cout << "It is turn for " << users[(steps + 1) % (users.size())].getUsername() << endl;
+        cout << "It is turn for " << users[steps % (users.size())].getUsername() << endl;
     }
 }
 
 //处理用户输入指令的方法
-void userInput(vector<Cell> &cells,int endNum,vector<User> &users,int &steps,int modeNum,int ROW,int COL){
+void userInput(vector<Cell> &cells,int endNum,vector<User> &users,int &steps,int modeNum,int ROW,int COL,bool log){
     //是否使用过cheat的功能的标志
     bool cheated = false;
     bool setCheated = false;
@@ -175,7 +177,7 @@ start : getline(cin,cheatOrder);
             user = steps % 2;
         }
         //判断有几个方向可以移动,如果只有一个,那就把这个方向传过来
-        updateCells(cells,order,users,steps,ROW,COL,modeNum);
+        updateCells(cells,order,users,steps,ROW,COL,modeNum,log);
         printCells(cells,users,steps,modeNum,ROW,COL);
         int* direction =  moveDirection(cells, users, ROW, COL, steps);
         char directionChar;
@@ -188,13 +190,13 @@ start : getline(cin,cheatOrder);
                         directionChar = 'w';
                         break;
                     case 1:
-                        directionChar = 's';
+                        directionChar = 'z';
                         break;
                     case 2:
                         directionChar = 'a';
                         break;
                     case 3:
-                        directionChar = 'd';
+                        directionChar = 's';
                         break;
                     }
                 }
@@ -206,7 +208,7 @@ start : getline(cin,cheatOrder);
             cout << "Please input your order:" << endl;
             cin >> order;
             //用户陷入被cheat的循环
-            updateCells(cells,order,users,steps,ROW,COL,modeNum,orderString,directionChar);
+            updateCells(cells,order,users,steps,ROW,COL,modeNum,orderString,directionChar,log);
             printCells(cells,users,steps,modeNum,ROW,COL);
             goto start;
         }
@@ -214,20 +216,20 @@ start : getline(cin,cheatOrder);
 }
 
 //上下左右更新图的方法
-void updateCells(vector<Cell> &cells,char order,vector<User> &users,int &steps,int ROW,int COL,int modeNum){
+void updateCells(vector<Cell> &cells,char order,vector<User> &users,int &steps,int ROW,int COL,int modeNum,bool log){
     vector<Cell> copyCells = cells;
     //在上下左右四个方向更新
     switch(order){
         case 'w':
             upUpdateCells(cells, users, ROW, COL, steps);
             break;
-        case 's':
+        case 'z':
             downUpdateCells(cells, users, ROW, COL, steps);
             break;
         case 'a':
             leftUpdateCells(cells, users, ROW, COL, steps);
             break;
-        case 'd':
+        case 's':
             rightUpdateCells(cells, users, ROW, COL, steps);
             break;
         case 'c':{
@@ -236,6 +238,22 @@ void updateCells(vector<Cell> &cells,char order,vector<User> &users,int &steps,i
         }
         default :
             cout << "Invalid order! Input again:" << endl;
+    }
+    //当细胞图发生了数值合并的有效操作后,如果开启了log方法就要log信息
+    int nullPlaceNum1 = 0;
+    for (int i = 0; i < cells.size(); i++){
+        if(cells[i].getValue() == 0){
+            nullPlaceNum1++;
+        }
+    }
+    int nullPlaceNum2 = 0;
+    for (int i = 0; i < cells.size(); i++){
+        if(copyCells[i].getValue() == 0){
+            nullPlaceNum2++;
+        }
+    }
+    if(nullPlaceNum1 != nullPlaceNum2 && log == true){
+        outputLog(users,order,steps);
     }
     //当细胞图真正发生改变时,才能生成一个2并且让步数加一
     bool changed = false;
@@ -251,7 +269,6 @@ void updateCells(vector<Cell> &cells,char order,vector<User> &users,int &steps,i
     if(changed == false && order != 'c'){
         cout << "The operator has not changed the map, please input again:" << endl;
     }
-    
 }
 
 //随机位置生成一个2的方法
@@ -355,7 +372,7 @@ vector<User> createUsers(int modeNum){
 }
 
 //结束游戏的方法
-void endGame(std::vector<User> users,int modeNum){
+void endGame(vector<User> users,int modeNum){
     cout << endl << "=================================" << endl
          << "Game over!" << endl;
     //打印用户的最终分数
@@ -380,7 +397,7 @@ void endGame(std::vector<User> users,int modeNum){
 }
 
 //判断移动方向的方法
-int* moveDirection(vector<Cell> cells,std::vector<User> users, int ROW, int COL,int &steps){
+int* moveDirection(vector<Cell> cells,vector<User> users, int ROW, int COL,int &steps){
     int directionNum = 0;
     int *direction = new int[5];
     for (int i = 0; i < 5;i++){
@@ -432,7 +449,7 @@ int* moveDirection(vector<Cell> cells,std::vector<User> users, int ROW, int COL,
     return direction;
 }
 
-void upUpdateCells(std::vector<Cell> &cells, std::vector<User> &users, int ROW, int COL,int &steps){
+void upUpdateCells(vector<Cell> &cells, vector<User> &users, int ROW, int COL,int &steps){
     //对每一列依次向上进行合并和移动
     for (int i = 0; i < COL; i++)
     {
@@ -465,7 +482,7 @@ void upUpdateCells(std::vector<Cell> &cells, std::vector<User> &users, int ROW, 
     }
 }
 
-void downUpdateCells(std::vector<Cell> &cells, std::vector<User> &users, int ROW, int COL,int &steps){
+void downUpdateCells(vector<Cell> &cells, vector<User> &users, int ROW, int COL,int &steps){
     //对每一列依次向下进行合并和移动
     for (int i = 0; i < COL;i++){
         //对第i列进行合并
@@ -495,7 +512,7 @@ void downUpdateCells(std::vector<Cell> &cells, std::vector<User> &users, int ROW
     }
 }
 
-void leftUpdateCells(std::vector<Cell> &cells, std::vector<User> &users, int ROW, int COL,int &steps){
+void leftUpdateCells(vector<Cell> &cells, vector<User> &users, int ROW, int COL,int &steps){
     //对每一行依次向左进行合并和移动
     for (int i = 0; i < ROW;i++){
         //对第i行进行合并
@@ -525,7 +542,7 @@ void leftUpdateCells(std::vector<Cell> &cells, std::vector<User> &users, int ROW
     }
 }
 
-void rightUpdateCells(std::vector<Cell> &cells, std::vector<User> &users, int ROW, int COL,int &steps){
+void rightUpdateCells(vector<Cell> &cells, vector<User> &users, int ROW, int COL,int &steps){
     //对每一行依次向右进行合并和移动
     for (int i = 0; i < ROW;i++){
         //对第i行进行合并
@@ -555,7 +572,8 @@ void rightUpdateCells(std::vector<Cell> &cells, std::vector<User> &users, int RO
     }
 }
 //重载的更新棋盘的方法
-void updateCells(vector<Cell> &cells,char order,vector<User> &users,int &steps,int ROW,int COL,int modeNum,string orderString,char directionChar){
+void updateCells(vector<Cell> &cells,char order,vector<User> &users,int &steps,int ROW,int COL,int modeNum,string orderString,char directionChar,bool log){
+    vector<Cell> copyCells = cells;
     //仅在指定位置上更新
     while(1){
         //若用户进入陷阱,就按照这个唯一的方向更新棋盘图
@@ -565,17 +583,33 @@ void updateCells(vector<Cell> &cells,char order,vector<User> &users,int &steps,i
                 case 'w' :
                     upUpdateCells(cells,users,ROW,COL,steps);
                     break;
-                case 's' :
+                case 'z' :
                     downUpdateCells(cells,users,ROW,COL,steps);
                     break;
                 case 'a' :
                     leftUpdateCells(cells, users, ROW, COL, steps);
                     break;
-                case 'd' :
+                case 's' :
                     rightUpdateCells(cells, users, ROW, COL, steps);
                     break;
             }
             createRand2(cells,users,modeNum);
+            //当细胞图发生了数值合并的有效操作后,如果开启了log方法就要log信息
+            int nullPlaceNum1 = 0;
+            for (int i = 0; i < cells.size(); i++){
+                if(cells[i].getValue() == 0){
+                    nullPlaceNum1++;
+                }
+            }
+            int nullPlaceNum2 = 0;
+            for (int i = 0; i < cells.size(); i++){
+                if(copyCells[i].getValue() == 0){
+                    nullPlaceNum2++;
+                }
+            }
+            if(nullPlaceNum1 != nullPlaceNum2 && log == true){
+                outputLog(users,order,steps);
+            }
             break;
         }
         else{
