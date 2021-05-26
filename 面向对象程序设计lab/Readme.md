@@ -18,13 +18,61 @@
 
 ​	即可获得main.exe这个编译后的可执行文件
 
-​	编译成功后如果驶入带命令行参数入下,则会读取in文件中的内容并将处理后的内容放置于out文件中
+---
+
+**注:由于使用了一些过时的函数,因此在编译时会出现警告,警告内容如下:**
 
 ```
-lab6.exe -i input.in -o outpu.out
+In file included from lab2048.cpp:11,
+                 from main.cpp:1:
+bonus.cpp: In function 'long long unsigned int currentTimeMillisec()':
+bonus.cpp:14:15: warning: 'timeb' is deprecated [-Wdeprecated-declarations]
+   14 |  struct timeb tb;
+      |               ^~
+In file included from bonus.cpp:6,
+                 from lab2048.cpp:11,
+                 from main.cpp:1:
+c:\mingw\include\sys\timeb.h:57:32: note: declared here
+   57 | struct __POSIX_2001_DEPRECATED timeb
+      |                                ^~~~~
+In file included from lab2048.cpp:11,
+                 from main.cpp:1:
+bonus.cpp:15:11: warning: 'void ftime(timeb*)' is deprecated [-Wdeprecated-declarations]
+   15 |  ftime(&tb);
+      |           ^
+In file included from bonus.cpp:6,
+                 from lab2048.cpp:11,
+                 from main.cpp:1:
+c:\mingw\include\sys\timeb.h:169:6: note: declared here
+  169 | void ftime (struct timeb *__t) {_ftime ((struct _timeb *)(__t)); }
+      |      ^~~~~
+In file included from lab2048.cpp:11,
+                 from main.cpp:1:
+bonus.cpp:15:11: warning: 'void ftime(timeb*)' is deprecated [-Wdeprecated-declarations]
+   15 |  ftime(&tb);
+      |           ^
+In file included from bonus.cpp:6,
+                 from lab2048.cpp:11,
+                 from main.cpp:1:
+c:\mingw\include\sys\timeb.h:169:6: note: declared here
+  169 | void ftime (struct timeb *__t) {_ftime ((struct _timeb *)(__t)); }
 ```
 
+**但是这些警告并不影响程序的正常运行**,忽略即可
 
+---
+
+​	编译成功后如果使用如下命令行参数,则会读取input.in文件中的内容并将处理后的内容放置于output.out文件中
+
+```
+main.exe -i input.in -o output.out
+```
+
+​	编译成功后如果使用如下命令行参数,则会将移动得分和奖励得分输出日志到该目录下的 log.txt文件中
+
+```
+main.exe -log -p
+```
 
 ---
 
