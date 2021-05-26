@@ -4,8 +4,7 @@
 #include <assert.h>
 using namespace std;
 
-void outputLog(vector<User> users,char order,int steps){
-    cout << order << endl;
+void outputLog(vector<User> users,char order,int steps,int addScore){
     //获取当前时间字符串
     time_t t = time(0);
     char time[64];
@@ -27,9 +26,9 @@ void outputLog(vector<User> users,char order,int steps){
             break;
     }
     if(users.size() == 1){
-        out << "移动得分: " << "默认用户 " << time << " " << direction << " " << users[0].getScore() << endl;
+        out << "移动得分: " << "默认用户 " << time << " " << direction << " " << addScore << endl;
     }
     else if(users.size() == 2){
-        out << "移动得分: " << users[steps%2].getUsername() << " " << time << " " << direction << " " << users[steps%2].getScore() << endl;
+        out << "移动得分: " << users[steps%2].getUsername() << " " << time << " " << direction << " " << addScore << endl;
     }
 }

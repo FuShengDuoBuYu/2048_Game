@@ -1,6 +1,8 @@
 #ifndef LAB2048_H
 #define LAB2048_H
-class Cell{
+using namespace std;
+class Cell
+{
 
     int value;
 
@@ -37,15 +39,15 @@ class Util{
         int *getRandArray(int length);
         Util(){};
         ~Util(){};
-        std::vector<int> stringToInt(std::string s);
+        vector<int> stringToInt(string s);
 };
 
 class User{
-    std:: string username;
+    string username;
     int score;
 
     public:
-        std:: string getUsername(){
+        string getUsername(){
             return this->username;
         }
         void setScore(int score){
@@ -54,7 +56,7 @@ class User{
         int getScore(){
             return this->score;
         }
-        User(std:: string username, int score){
+        User(string username, int score){
             this->username = username;
             this->score = score;
         };
@@ -63,22 +65,22 @@ class User{
 };
 
 //方法声明
-void printCells(std::vector<Cell> cells,std::vector<User> users,int steps,int modeNum,int ROW,int COL);
-std::vector<Cell> createCells(int ROW,int COL);
-void userInput(std::vector<Cell> &cells,int endNum,std::vector<User> &users,int &steps,int modeNum,int ROW,int COL,bool log);
-void updateCells(std::vector<Cell> &cells,char order,std::vector<User> &users,int &steps,int ROW,int COL,int modeNum,bool log);
-int createRand2(std::vector<Cell> &cells,std::vector<User> &users,int modeNum);
+void printCells(vector<Cell> cells,vector<User> users,int steps,int modeNum,int ROW,int COL);
+vector<Cell> createCells(int ROW,int COL);
+void userInput(vector<Cell> &cells,int endNum,vector<User> &users,int &steps,int modeNum,int ROW,int COL,bool log,bool bonus);
+void updateCells(vector<Cell> &cells,char order,vector<User> &users,int &steps,int ROW,int COL,int modeNum,bool log,bool bonus);
+int createRand2(vector<Cell> &cells,vector<User> &users,int modeNum);
 void ifTest(int &endNum);
 int welcomePage(int &ROW,int &COL);
-std::vector<User> createUsers(int modeNum);
-void endGame(std::vector<User> users,int modeNum);
-void upUpdateCells(std::vector<Cell> &cells, std::vector<User> &users, int ROW, int COL,int &steps);
-void downUpdateCells(std::vector<Cell> &cells, std::vector<User> &users, int ROW, int COL,int &steps);
-void leftUpdateCells(std::vector<Cell> &cells, std::vector<User> &users, int ROW, int COL,int &steps);
-void rightUpdateCells(std::vector<Cell> &cells, std::vector<User> &users, int ROW, int COL,int &steps);
-int* moveDirection(std::vector<Cell> cells, std::vector<User> users, int ROW, int COL, int &steps);
-void updateCells(std::vector<Cell> &cells,char order,std::vector<User> &users,int &steps,int ROW,int COL,int modeNum,std::string orderString,char directionChar,bool log);
-std::vector<std::string> readFiles(std::string filename);
-char handleMessageInFile(std::vector<std::string> fileContent, int &ROW, int &COL, std::vector<Cell> &cells);
-std::vector<std::string> resultFile(char moveDirections,std::vector<Cell> cells,std::vector<User> users,int ROW,int COL);
+vector<User> createUsers(int modeNum);
+void endGame(vector<User> users,int modeNum);
+int upUpdateCells(vector<Cell> &cells, vector<User> &users, int ROW, int COL,int &steps);
+int downUpdateCells(vector<Cell> &cells, vector<User> &users, int ROW, int COL,int &steps);
+int leftUpdateCells(vector<Cell> &cells, vector<User> &users, int ROW, int COL,int &steps);
+int rightUpdateCells(vector<Cell> &cells, vector<User> &users, int ROW, int COL,int &steps);
+int* moveDirection(vector<Cell> cells, vector<User> users, int ROW, int COL, int &steps);
+void updateCells(vector<Cell> &cells,char order,vector<User> &users,int &steps,int ROW,int COL,int modeNum,string orderString,char directionChar,bool log,bool bonus);
+vector<string> readFiles(string filename);
+char handleMessageInFile(vector<string> fileContent, int &ROW, int &COL, vector<Cell> &cells);
+vector<string> resultFile(char moveDirections,vector<Cell> cells,vector<User> users,int ROW,int COL);
 #endif

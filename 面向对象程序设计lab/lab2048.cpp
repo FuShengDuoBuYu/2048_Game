@@ -8,7 +8,7 @@
 #include <cstdlib>
 #include <fstream>
 #include "log.h"
-
+#include "bonus.cpp"
 using namespace std;
 
 //Cell类的方法实现
@@ -142,7 +142,7 @@ void printCells(vector<Cell> cells,vector<User> users,int steps,int modeNum,int 
 }
 
 //处理用户输入指令的方法
-void userInput(vector<Cell> &cells,int endNum,vector<User> &users,int &steps,int modeNum,int ROW,int COL,bool log){
+void userInput(vector<Cell> &cells,int endNum,vector<User> &users,int &steps,int modeNum,int ROW,int COL,bool log,bool bonus){
     //是否使用过cheat的功能的标志
     bool cheated = false;
     bool setCheated = false;
@@ -177,7 +177,7 @@ start : getline(cin,cheatOrder);
             user = steps % 2;
         }
         //判断有几个方向可以移动,如果只有一个,那就把这个方向传过来
-        updateCells(cells,order,users,steps,ROW,COL,modeNum,log);
+        updateCells(cells,order,users,steps,ROW,COL,modeNum,log,bonus);
         printCells(cells,users,steps,modeNum,ROW,COL);
         int* direction =  moveDirection(cells, users, ROW, COL, steps);
         char directionChar;
@@ -208,7 +208,7 @@ start : getline(cin,cheatOrder);
             cout << "Please input your order:" << endl;
             cin >> order;
             //用户陷入被cheat的循环
-            updateCells(cells,order,users,steps,ROW,COL,modeNum,orderString,directionChar,log);
+            updateCells(cells,order,users,steps,ROW,COL,modeNum,orderString,directionChar,log,bonus);
             printCells(cells,users,steps,modeNum,ROW,COL);
             goto start;
         }
@@ -216,21 +216,22 @@ start : getline(cin,cheatOrder);
 }
 
 //上下左右更新图的方法
-void updateCells(vector<Cell> &cells,char order,vector<User> &users,int &steps,int ROW,int COL,int modeNum,bool log){
+void updateCells(vector<Cell> &cells,char order,vector<User> &users,int &steps,int ROW,int COL,int modeNum,bool log,bool bonus){
     vector<Cell> copyCells = cells;
+    int addScore = 0;
     //在上下左右四个方向更新
     switch(order){
         case 'w':
-            upUpdateCells(cells, users, ROW, COL, steps);
+            addScore += upUpdateCells(cells, users, ROW, COL, steps);
             break;
         case 'z':
-            downUpdateCells(cells, users, ROW, COL, steps);
+            addScore += downUpdateCells(cells, users, ROW, COL, steps);
             break;
         case 'a':
-            leftUpdateCells(cells, users, ROW, COL, steps);
+            addScore += leftUpdateCells(cells, users, ROW, COL, steps);
             break;
         case 's':
-            rightUpdateCells(cells, users, ROW, COL, steps);
+            addScore += rightUpdateCells(cells, users, ROW, COL, steps);
             break;
         case 'c':{
             cout << endl;
@@ -253,9 +254,9 @@ void updateCells(vector<Cell> &cells,char order,vector<User> &users,int &steps,i
         }
     }
     if(nullPlaceNum1 != nullPlaceNum2 && log == true){
-        outputLog(users,order,steps);
+        outputLog(users,order,steps,addScore);
     }
-    //当细胞图真正发生改变时,才能生成一个2并且让步数加一
+    //当细胞图真正发生改变时,才能生成一个2并且让步数加一,检查是否符合奖励的要求
     bool changed = false;
     for (int i = 0; i < cells.size();i++){
         if(cells[i].getValue()!=copyCells[i].getValue()){
@@ -264,6 +265,9 @@ void updateCells(vector<Cell> &cells,char order,vector<User> &users,int &steps,i
             changed = true;
             break;
         }
+    }
+    if(changed == true && log == true && bonus == true){
+        outputBonus(users,steps);
     }
     //若是没有让棋盘发生变化,那么就是无效输入
     if(changed == false && order != 'c'){
@@ -449,7 +453,8 @@ int* moveDirection(vector<Cell> cells,vector<User> users, int ROW, int COL,int &
     return direction;
 }
 
-void upUpdateCells(vector<Cell> &cells, vector<User> &users, int ROW, int COL,int &steps){
+int upUpdateCells(vector<Cell> &cells, vector<User> &users, int ROW, int COL,int &steps){
+    int addScore = 0;
     //对每一列依次向上进行合并和移动
     for (int i = 0; i < COL; i++)
     {
@@ -461,6 +466,7 @@ void upUpdateCells(vector<Cell> &cells, vector<User> &users, int ROW, int COL,in
                     cells[i+j*COL].changeValue(2*cells[i+j*COL].getValue());
                     cells[i+k*COL].changeValue(0);
                     users[steps%(users.size())].setScore(users[steps%(users.size())].getScore() + cells[i + j * COL].getValue());
+                    addScore += cells[i + j * COL].getValue();
                     break;
                 }
                 //没有可以合并的
@@ -480,9 +486,11 @@ void upUpdateCells(vector<Cell> &cells, vector<User> &users, int ROW, int COL,in
             }
         }
     }
+    return addScore;
 }
 
-void downUpdateCells(vector<Cell> &cells, vector<User> &users, int ROW, int COL,int &steps){
+int downUpdateCells(vector<Cell> &cells, vector<User> &users, int ROW, int COL,int &steps){
+    int addScore = 0;
     //对每一列依次向下进行合并和移动
     for (int i = 0; i < COL;i++){
         //对第i列进行合并
@@ -492,6 +500,7 @@ void downUpdateCells(vector<Cell> &cells, vector<User> &users, int ROW, int COL,
                     cells[i+j*COL].changeValue(2*cells[i+j*COL].getValue());
                     cells[i+k*COL].changeValue(0);
                     users[steps%(users.size())].setScore(users[steps%(users.size())].getScore() + cells[i+j*COL].getValue());
+                    addScore += cells[i + j * COL].getValue();
                     break;
                 }
                 if(cells[i+j*COL].getValue()!=0 && cells[i+k*COL].getValue()!=0 && cells[i+j*COL].getValue()!=cells[i+k*COL].getValue()){
@@ -510,9 +519,11 @@ void downUpdateCells(vector<Cell> &cells, vector<User> &users, int ROW, int COL,
             }
         }
     }
+    return addScore;
 }
 
-void leftUpdateCells(vector<Cell> &cells, vector<User> &users, int ROW, int COL,int &steps){
+int leftUpdateCells(vector<Cell> &cells, vector<User> &users, int ROW, int COL,int &steps){
+    int addScore = 0;
     //对每一行依次向左进行合并和移动
     for (int i = 0; i < ROW;i++){
         //对第i行进行合并
@@ -522,6 +533,7 @@ void leftUpdateCells(vector<Cell> &cells, vector<User> &users, int ROW, int COL,
                     cells[i * ROW + j].changeValue(2*cells[i * ROW + j].getValue());
                     cells[i * ROW + k].changeValue(0);
                     users[steps%(users.size())].setScore(users[steps%(users.size())].getScore() + cells[i * ROW + j].getValue());
+                    addScore += cells[i * ROW + j].getValue();
                     break;
                 }
                 if(cells[i*ROW+j].getValue()!=0 && cells[i*ROW+k].getValue()!=0 && cells[i*ROW+j].getValue()!=cells[i*ROW+k].getValue()){
@@ -540,9 +552,11 @@ void leftUpdateCells(vector<Cell> &cells, vector<User> &users, int ROW, int COL,
             }
         }
     }
+    return addScore;
 }
 
-void rightUpdateCells(vector<Cell> &cells, vector<User> &users, int ROW, int COL,int &steps){
+int rightUpdateCells(vector<Cell> &cells, vector<User> &users, int ROW, int COL,int &steps){
+    int addScore = 0;
     //对每一行依次向右进行合并和移动
     for (int i = 0; i < ROW;i++){
         //对第i行进行合并
@@ -552,6 +566,7 @@ void rightUpdateCells(vector<Cell> &cells, vector<User> &users, int ROW, int COL
                     cells[i * ROW + j].changeValue(2*cells[i * ROW + j].getValue());
                     cells[i * ROW + k].changeValue(0);
                     users[steps%(users.size())].setScore(users[steps%(users.size())].getScore() + cells[i * ROW + j].getValue());
+                    addScore += cells[i * ROW + j].getValue();
                     break;
                 }
                 if(cells[i*ROW+j].getValue()!=0 && cells[i*ROW+k].getValue()!=0 && cells[i*ROW+j].getValue()!=cells[i*ROW+k].getValue()){
@@ -570,9 +585,11 @@ void rightUpdateCells(vector<Cell> &cells, vector<User> &users, int ROW, int COL
             }
         }
     }
+    return addScore;
 }
 //重载的更新棋盘的方法
-void updateCells(vector<Cell> &cells,char order,vector<User> &users,int &steps,int ROW,int COL,int modeNum,string orderString,char directionChar,bool log){
+void updateCells(vector<Cell> &cells,char order,vector<User> &users,int &steps,int ROW,int COL,int modeNum,string orderString,char directionChar,bool log,bool bonus){
+    int addScore = 0;
     vector<Cell> copyCells = cells;
     //仅在指定位置上更新
     while(1){
@@ -581,16 +598,16 @@ void updateCells(vector<Cell> &cells,char order,vector<User> &users,int &steps,i
             steps++;
             switch(order){
                 case 'w' :
-                    upUpdateCells(cells,users,ROW,COL,steps);
+                    addScore += upUpdateCells(cells,users,ROW,COL,steps);
                     break;
                 case 'z' :
-                    downUpdateCells(cells,users,ROW,COL,steps);
+                    addScore += downUpdateCells(cells,users,ROW,COL,steps);
                     break;
                 case 'a' :
-                    leftUpdateCells(cells, users, ROW, COL, steps);
+                    addScore += leftUpdateCells(cells, users, ROW, COL, steps);
                     break;
                 case 's' :
-                    rightUpdateCells(cells, users, ROW, COL, steps);
+                    addScore += rightUpdateCells(cells, users, ROW, COL, steps);
                     break;
             }
             createRand2(cells,users,modeNum);
@@ -608,7 +625,10 @@ void updateCells(vector<Cell> &cells,char order,vector<User> &users,int &steps,i
                 }
             }
             if(nullPlaceNum1 != nullPlaceNum2 && log == true){
-                outputLog(users,order,steps);
+                outputLog(users,order,steps,addScore);
+            }
+            if(log == true && bonus == true){
+                outputBonus(users,steps);
             }
             break;
         }

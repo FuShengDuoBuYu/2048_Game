@@ -9,6 +9,7 @@ int main(int argc,char *argv[]){
     vector<Cell> cells;
     vector<User> users;
     bool log = false;
+    bool bonus = false;
     //双方一共进行了多少步
     int steps = 0;
     for (int i = 1; i < argc;i++){
@@ -33,6 +34,9 @@ int main(int argc,char *argv[]){
         else if(strcmp("-log",argv[i]) == 0){
             log = true;
         }
+        else if(strcmp("-p",argv[i]) == 0){
+            bonus = true;
+        }
     }
     
     //如果是测试模式,就把终结数字改为64
@@ -44,6 +48,6 @@ int main(int argc,char *argv[]){
     //打印棋盘
     printCells(cells,users,steps,modeNum,ROW,COL);
     //处理用户的输入
-    userInput(cells,endNum,users,steps,modeNum,ROW,COL,log);
+    userInput(cells,endNum,users,steps,modeNum,ROW,COL,log,bonus);
     return 0;
 } 
