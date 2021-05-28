@@ -1,5 +1,4 @@
 #include "lab2048.cpp"
-#include "log.cpp"
 
 using namespace std;
 int main(int argc,char *argv[]){

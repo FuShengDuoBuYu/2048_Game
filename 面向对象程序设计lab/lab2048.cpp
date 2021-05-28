@@ -7,7 +7,7 @@
 #include "lab2048.h"
 #include <cstdlib>
 #include <fstream>
-#include "log.h"
+#include "log.cpp"
 #include "bonus.cpp"
 using namespace std;
 
@@ -254,7 +254,8 @@ void updateCells(vector<Cell> &cells,char order,vector<User> &users,int &steps,i
         }
     }
     if(nullPlaceNum1 != nullPlaceNum2 && log == true){
-        outputLog(users,order,steps,addScore);
+        logObserver lo;
+        lo.outputLog(users, order, steps, addScore);
     }
     //当细胞图真正发生改变时,才能生成一个2并且让步数加一,检查是否符合奖励的要求
     bool changed = false;
@@ -267,7 +268,8 @@ void updateCells(vector<Cell> &cells,char order,vector<User> &users,int &steps,i
         }
     }
     if(changed == true && log == true && bonus == true){
-        outputBonus(users,steps);
+        bonusObserver bo;
+        bo.outputBonus(users, steps);
     }
     //若是没有让棋盘发生变化,那么就是无效输入
     if(changed == false && order != 'c'){
@@ -625,10 +627,12 @@ void updateCells(vector<Cell> &cells,char order,vector<User> &users,int &steps,i
                 }
             }
             if(nullPlaceNum1 != nullPlaceNum2 && log == true){
-                outputLog(users,order,steps,addScore);
+                logObserver lo;
+                lo.outputLog(users, order, steps, addScore);
             }
             if(log == true && bonus == true){
-                outputBonus(users,steps);
+                bonusObserver bo;
+                bo.outputBonus(users, steps);
             }
             break;
         }

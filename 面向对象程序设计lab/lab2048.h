@@ -65,7 +65,7 @@ class User{
 };
 
 //方法声明
-void printCells(vector<Cell> cells,vector<User> users,int steps,int modeNum,int ROW,int COL);
+void printCells(vector<Cell> cells, vector<User> users, int steps, int modeNum, int ROW, int COL);
 vector<Cell> createCells(int ROW,int COL);
 void userInput(vector<Cell> &cells,int endNum,vector<User> &users,int &steps,int modeNum,int ROW,int COL,bool log,bool bonus);
 void updateCells(vector<Cell> &cells,char order,vector<User> &users,int &steps,int ROW,int COL,int modeNum,bool log,bool bonus);
