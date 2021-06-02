@@ -1,4 +1,3 @@
-#include "lab2048.h"
 #ifndef OBSERVER_H
 #define OBSERVER_H
 #include <vector>

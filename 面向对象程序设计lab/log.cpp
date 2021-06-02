@@ -1,4 +1,7 @@
+#ifndef LOG_CPP
+#define LOG_CPP
 #include "Observer.h"
+#include <fstream>
 class logObserver : public cellsChangedObserver{
     public:
     void outputLog(std::vector<User> users, char order,int steps,int addScore){
@@ -31,3 +34,5 @@ class logObserver : public cellsChangedObserver{
     }
     void outputBonus(vector<User> &users, int steps){}
 };
+
+#endif

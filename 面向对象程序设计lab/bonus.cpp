@@ -1,4 +1,6 @@
-#include "lab2048.h"
+#ifndef BONUS_CPP
+#define BONUS_CPP
+
 #include <assert.h>
 #include <sys/timeb.h>
 #include "Observer.h"
@@ -34,13 +36,15 @@ class bonusObserver: public cellsChangedObserver{
             }
             else if(users.size() == 2){
                 //输出日志
-                out << "奖励得分: " << users[(steps+1)%2].getUsername() << " " 
+                out << "奖励得分: " << users[(steps)%2].getUsername() << " " 
                 << time << " 0." << (nowMilltime - lastMilltime)/100 << " 1" << endl;
                 //总分加1
-                users[(steps+1)%2].setScore(users[(steps+1)%2].getScore() + 1);
+                users[(steps)%2].setScore(users[(steps)%2].getScore() + 1);
             }
         }
         lastMilltime = nowMilltime;
     }
     void outputLog(std::vector<User> users, char order,int steps,int addScore){}
 };
+
+#endif
