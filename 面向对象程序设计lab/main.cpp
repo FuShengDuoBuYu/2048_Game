@@ -1,5 +1,4 @@
-// #include "lab2048.cpp"
-#include "Console.cpp"
+#include "Console.h"
 using namespace std;
 int main(int argc,char *argv[]){
     //获取游戏主体

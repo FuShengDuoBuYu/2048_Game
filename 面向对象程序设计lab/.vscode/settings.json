@@ -44,7 +44,9 @@
         "stdexcept": "cpp",
         "streambuf": "cpp",
         "typeinfo": "cpp",
-        "cstring": "cpp"
+        "cstring": "cpp",
+        "ctime": "cpp",
+        "set": "cpp"
     },
     "C_Cpp.dimInactiveRegions": false
 }

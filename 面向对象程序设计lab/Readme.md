@@ -13,7 +13,7 @@
 ​	进入到dos命令窗口并达到源文件目录下后,输入以下命令:
 
 ```dos窗口
-  	g++ main.cpp -o main.exe
+  	g++ *.cpp -o main.exe
 ```
 
 ​	即可获得main.exe这个编译后的可执行文件

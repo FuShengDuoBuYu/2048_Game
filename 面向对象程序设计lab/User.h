@@ -1,5 +1,5 @@
-#ifndef USER_CPP
-#define USER_CPP
+#ifndef USER_H
+#define USER_H
 #include <string>
 class User{
     std::string username;
@@ -18,6 +18,7 @@ class User{
         void addScore(int addScore){
             score += addScore;
         }
+        
         User(std::string username, int score){
             this->username = username;
             this->score = score;
