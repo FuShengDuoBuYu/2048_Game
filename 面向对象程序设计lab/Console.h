@@ -10,9 +10,12 @@
 #include "Cheat.h"
 #include <cstring>
 #include "FileHandle.h"
+#include "Repentance.h"
 class Console{
+    friend CellsBorad;
     public:
         Settings s;
+        Repentance r;
         Cheat cheat;
         CellsBorad cellsBorad;
         std::vector<User> Users;
@@ -29,10 +32,13 @@ class Console{
         //游戏结束调用的函数
         void endGame(int gameMode);
 
-        Console(Settings ss){
+        Console(Settings ss,Repentance rr){
             this->s = ss;
+            this->r = rr;
         }
         Console(){}
         ~Console(){}
+
+        
 };
 #endif //CONSOLE_H

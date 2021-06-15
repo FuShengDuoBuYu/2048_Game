@@ -4,8 +4,10 @@
 class User{
     std::string username;
     int score;
-
+    
     public:
+        int repentanceStep = -1;
+        int repentanceNum = 3;
         std::string getUsername(){
             return this->username;
         }

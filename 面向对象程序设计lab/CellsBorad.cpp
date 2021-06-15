@@ -38,12 +38,10 @@ int CellsBorad::updateBorad(char order,int ROW,int COL){
         }
     }
     Util u;
-    // cout << u.boardChanged(cells, copyCells);
     if(u.boardChanged(cells,copyCells) == true){
         createRand2(cells);
         steps++;
-    }
-                
+    }        
 
     else{
         cout << "Your order has not change the board." << endl;

@@ -2,7 +2,7 @@
 using namespace std;
 int main(int argc,char *argv[]){
     //获取游戏主体
-    Console c(Settings(4,4));
+    Console c(Settings(4,4),Repentance());
     c.getLaunch(argc, argv);
     c.cellsBorad = CellsBorad(c.s.col, c.s.row);
     c.welcomePage();

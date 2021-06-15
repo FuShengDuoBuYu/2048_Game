@@ -2,7 +2,8 @@
 using namespace std;
 void Cheat::setCheat(vector<User> users,int steps){
     beCheatedUsername = users[steps % users.size()].getUsername();
-    cheatOrder = cheatString.substr(2, cheatString.length() - 1);
+    //由于用了两个cin没有用getline,此时两个变量一样了,不用再截取子串
+    cheatOrder = cheatString;
     isCheated = true;
     waitingForCheated = true;
 }
@@ -27,6 +28,7 @@ string Cheat::beCheated(int direction[]){
         }
     }
     string directionString(1,directionChar);
+    //由于字符串append会修改原字符串,故存一个旧的字符串备份
     string copyCheatOrder = cheatOrder;
     result = cheatOrder.append(",if you agree,input '").append(directionString).append("'");
     cheatOrder = copyCheatOrder;

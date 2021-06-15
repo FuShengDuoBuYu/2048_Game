@@ -4,9 +4,9 @@ using namespace std;
 //获取当前距离1970年的毫秒数
 unsigned long long lastMilltime = 0;
 unsigned long long currentTimeMillisec(){
-            struct timeb tb;
-            ftime(&tb);
-            return tb.time * 1000 + tb.millitm;
+    struct timeb tb;
+    ftime(&tb);
+    return tb.time * 1000 + tb.millitm;
 }
 
 void bonusObserver::outputBonus(std::vector<User> &users,int steps){

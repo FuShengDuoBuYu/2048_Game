@@ -20,7 +20,6 @@ void Console::handleArgv(int argc,char *argv[]){
         if(strcmp("-s", argv[i]) == 0){
             if(strcmp("2", argv[i+1])==0 ||strcmp("3", argv[i+1])==0 ||strcmp("4", argv[i+1])==0 ||strcmp("5", argv[i+1])==0){
                 s.col = s.row = argv[i + 1][0] - '0';
-                // cout << s.col << endl;
             }
             else{
                 cout << "please input the dimension of 3 4 or 5" << endl;
@@ -33,6 +32,7 @@ void Console::handleArgv(int argc,char *argv[]){
                 FileHandle fh(argv[i + 1],argv[i + 3]);
                 vector<string> content = fh.readFiles(argv[i + 1]);
                 char moveDirection = fh.handleMessageInFile(content, fh.row, fh.col);
+                
                 vector<string> resultString = fh.resultFile(moveDirection,fh.row,fh.col);
                 fh.outputFile(resultString);
                 exit(0);
@@ -42,12 +42,10 @@ void Console::handleArgv(int argc,char *argv[]){
         //开启log功能
         if(strcmp("-log",argv[i]) == 0){
             s.startLog();
-            // cout << s.getLogStatus();
         }
         //开启bonus功能
         if(strcmp("-p",argv[i]) == 0){
             s.startBonus();
-            // cout << s.getBonusStatus();
         }
     }
 }
@@ -84,39 +82,65 @@ void Console::printCellsBorad(){
     cout << "+" << endl;
     //打印用户的当前分数
     for (int i = 0; i < Users.size();i++){
-        cout << Users[i].getUsername()
-            << " current score is "
-            << Users[i].getScore() << endl;
-    }
-    //打印下一个用户该输入指令
-    if(s.gameMode != 1){
-        cout << "It is turn for " << Users[(cellsBorad.steps+1) % (Users.size())].getUsername() << endl;
+        cout << Users[i].getUsername() << " current score is " << Users[i].getScore() << endl;
     }
     //判断是不是死棋
-    if(cellsBorad.deadBoard(s.endNum) == true){
+    if(cellsBorad.deadBoard(s.endNum) == true || cellsBorad.moveDirection(s.row,s.col)[4] == 0){
         endGame(s.gameMode);
     }
-    if(cellsBorad.moveDirection(s.row,s.col)[4] == 0){
-        endGame(s.gameMode);
+    
+    //考虑悔棋
+    if(cellsBorad.steps != 0 && (cellsBorad.steps!= Users[cellsBorad.steps % Users.size()].repentanceStep&& s.gameMode == 2 || s.gameMode == 1) ){
+        char repentanceOrder = r.printRepentance(Users[(cellsBorad.steps+1)%Users.size()].repentanceNum);
+        //确定悔棋
+        if(repentanceOrder == 'y'){
+            //可悔棋次数减一
+            Users[(cellsBorad.steps+1)%Users.size()].repentanceNum--;
+            //修改棋盘,用户得分和游戏步数
+            r.repentanceChessBorad(cellsBorad.cells);
+            r.repentanceScore(Users, cellsBorad.steps);
+            cellsBorad.steps--;
+            //打印棋盘
+            Users[cellsBorad.steps % Users.size()].repentanceStep = cellsBorad.steps;
+            printCellsBorad();
+        }else{
+            if(s.gameMode != 1){
+                cout << "It is turn for " << Users[(cellsBorad.steps+1) % (Users.size())].getUsername() << endl;
+            }
+        }
+    }else{
+        if(s.gameMode != 1){
+                cout << "It is turn for " << Users[(cellsBorad.steps+1) % (Users.size())].getUsername() << endl;
+        }
     }
+
     //考虑Cheat
     if(cellsBorad.moveDirection(s.row,s.col)[4] == 1 && Users[cellsBorad.steps%Users.size()].getUsername() != cheat.beCheatedUsername && cheat.waitingForCheated == true){
         cout << cheat.beCheated(cellsBorad.moveDirection(s.row, s.col)) << endl;
     }
+    
+    
 }
 void Console::userInput(){
     char order;
     Util u;
     string inputString;
-    getline(cin,inputString);
+    string inputString2;
     while(1){
         cout << "please input your order:" << endl;
-        getline(cin,inputString);
-        order = inputString.c_str()[0];
+        cin >> inputString2;
+        if(inputString2 == "c"){
+            cin >> inputString;
+        }    
+        order = inputString2.c_str()[0];
         if(order == 'w' ||order == 'a' ||order == 's' ||order == 'z'){
             //更改cheat状态
             if(order == cheat.directionChar && cheat.waitingForCheated == true){
                 cheat.waitingForCheated = false;
+            }
+            else if(order != cheat.directionChar&& cellsBorad.moveDirection(s.row,s.col)[4] == 1 && Users[cellsBorad.steps%Users.size()].getUsername() != cheat.beCheatedUsername && cheat.waitingForCheated == true){
+                cout << "Your order has not changed the chessboard" << endl;
+                continue;
             }
             int addScores = 0;
             vector<Cell> copyCells = cellsBorad.cells;
@@ -131,6 +155,18 @@ void Console::userInput(){
             if(u.boardChanged(copyCells,cellsBorad.cells) && s.getLogStatus() && s.getBonusStatus()){
                 bonusObserver bo;
                 bo.outputBonus(Users,cellsBorad.steps);
+            }
+            //记录悔棋棋盘和用户得分
+            if(u.boardChanged(copyCells,cellsBorad.cells)){
+                if(cellsBorad.steps == 1 && r.recordFirstStatus == false){
+                    r.recordChessBorad(copyCells,Users[cellsBorad.steps%Users.size()].repentanceNum);
+                    for (int i = 0; i < s.gameMode;i++){
+                        r.recordScore(0,Users[cellsBorad.steps%Users.size()].repentanceNum);
+                    }
+                    r.recordFirstStatus = true;
+                }
+                r.recordChessBorad(cellsBorad.cells,Users[cellsBorad.steps%Users.size()].repentanceNum);
+                r.recordScore(Users[cellsBorad.steps % Users.size()].getScore(),Users[cellsBorad.steps%Users.size()].repentanceNum);
             }
             printCellsBorad();
         }
