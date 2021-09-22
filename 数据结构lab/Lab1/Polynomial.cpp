@@ -50,34 +50,10 @@ public:
     Polynomial add(Polynomial *another) {
         Term *copyHead = head;
         Term *anotherHead = another->head;
-        // while(another->head!=nullptr){
-        //     cout << another->head->getExp() << endl;
-        //     another->head = another->head->getNext();
-        // }
-        // while(anotherHead!=nullptr){
-        //     anotherHead = anotherHead->getNext();
-        // }
-        //将要加的多项式的项添加在后面
-        // while(copyHead!=nullptr){
-        //     // cout << another->head->getExp() << endl;
-        //     // copyHead = new Term(another->head->getCoef(), another->head->getExp());
-        //     // copyHead = copyHead->getNext();
-        //     // another->head = another->head->getNext();
-        //     anotherHead = new Term(copyHead->getCoef(), copyHead->getExp());
-        //     //  cout << anotherHead->getCoef() << " " << anotherHead->getExp() << endl;
-        //     anotherHead = anotherHead->getNext();
-        //     copyHead = copyHead->getNext();
-        // }
-        // anotherHead = another->head;
-        // while(anotherHead!=nullptr){
-        //     cout << anotherHead->getCoef() << " " << anotherHead->getExp() << endl;
-        //     anotherHead = anotherHead->getNext();
-        // }
-        // return *another;
+        //新创建 一个链表
         Polynomial *result = new Polynomial(head);
         while(anotherHead!=nullptr){
             result->addTerm(new Term(anotherHead->getCoef(),anotherHead->getExp()));
-            // cout << anotherHead->getCoef() << " " << anotherHead->getExp() << endl;
             anotherHead = anotherHead->getNext();
         }
         return *result;
